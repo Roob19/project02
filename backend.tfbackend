@@ -4,6 +4,6 @@ terraform {
     storage_account_name = "team2tfstate"
     container_name       = "team2tfstate"
     key                  = "terraform.tfstate"
-    sas_token = "sp=racwt&st=2022-09-08T11:59:34Z&se=2022-10-07T19:59:34Z&sv=2021-06-08&sr=b&sig=hsdwkfkv0eagrqbeByCcIHhZvsH4CGo4V8tNwRX%2Foz0%3D"
+    sas_token = var.t2_sas_token
   }
 }
