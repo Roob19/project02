@@ -3,7 +3,7 @@ terraform {
     resource_group_name  = "Team2_Project2"
     storage_account_name = "team2tfstate"
     container_name       = "team2tfstate"
-    key                  = "terraform.tfstate"
+    key                  = "rad.terraform.tfstate"
     sas_token = var.t2_sas_token
   }
 }

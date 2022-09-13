@@ -42,10 +42,11 @@ module "load_balancer_east" {
   rg_location               = module.rg_east.main_rg.location
   lb_name                   = "vmss_lb_east"
   lb_front_ip_name          = "lb_frontend_ip_east"
+  dns_label                 = "t2-pubip-dns-east"
   lb_nat_pool_name          = "lb_ssh_nat_east"
   lb_nat_protocol           = "Tcp"
-  lb_nat_port_start         = 50000
-  lb_nat_port_end           = 50119
+  lb_nat_port_start         = 50005
+  lb_nat_port_end           = 50055
   lb_nat_backend_port       = 22
   lb_nat_front_config_name  = "lb_frontend_ip_east"
   lb_backend_pool_name      = "lb_backend_addresses_east"
@@ -107,6 +108,7 @@ module "load_balancer_west" {
   rg_location               = module.rg_west.main_rg.location
   lb_name                   = "lb_west"
   lb_front_ip_name          = "lb_frontend_ip_west"
+  dns_label                 = "t2-pubip-dns-west"
   lb_nat_pool_name          = "lb_nat_ssh_west"
   lb_nat_protocol           = "Tcp"
   lb_nat_port_start         = 50005
@@ -120,12 +122,12 @@ module "load_balancer_west" {
   lb_rule_back_port         = 80
   lb_rule_front_config_name = "lb_frontend_ip_west"
 }
-/*
+
 module "vmss_west" {
   source                       = "./modules/vmss"
   vmss_subnet_name             = "scale_set_west"
   vnet_name                    = module.vnet_west.vnet_name
-  vmss_subnet_address_prefixes = ["172.16.1.0/24"]
+  vmss_subnet_address_prefixes = ["192.16.1.0/24"]
   vmss_name                    = "scale-set-west"
   rg_name                      = module.rg_west.main_rg.name
   rg_location                  = module.rg_west.main_rg.location
@@ -147,7 +149,7 @@ module "vmss_west" {
   lb_backend_ids           = [module.load_balancer_west.lb_backend_pool_id]
   lb_inbound_nat_rules_ids = [module.load_balancer_west.lb_nat_pool_id]
 }
-*/
+
 
 ### CENTRAL
 module "rg_cent" {
@@ -181,16 +183,18 @@ module "traffic_manager" {
   timeout_secs           = 9
   tolerated_num_of_fails = 3
 
-  endpoint_a                = "t2_endpoint_a"
-  type_endpoint_a           = "azureEndpoints"
+  endpoint_a = "t2_endpoint_a"
+  #   type_endpoint_a           = "azureEndpoints" # azureEndpoints externalEndpoints nestedEndpoints
+  #   dns_label_endpoint_a      = "t2dnslabeleast.eastus.cloudapp.azure.com"
   id_of_targeted_resource_a = module.load_balancer_east.lb_pub_ip_id
-  ### module.load_balancer_east.load_balancer_id
-  ### "/subscriptions/65684f2a-01e2-443f-8763-39047d2a965b/resourceGroups/T2_RG_EAST/providers/Microsoft.Network/loadBalancers/vmss_lb_east"
+  # module.load_balancer_east.load_balancer_id
+  # "/subscriptions/65684f2a-01e2-443f-8763-39047d2a965b/resourceGroups/T2_RG_EAST/providers/Microsoft.Network/loadBalancers/vmss_lb_east"
   weight_of_endpoint_a = 10
 
-  endpoint_b                = "t2_endpoint_b"
-  type_endpoint_b           = "azureEndpoints"
+  endpoint_b = "t2_endpoint_b"
+  #   type_endpoint_b           = "azureEndpoints" # azureEndpoints externalEndpoints nestedEndpoints
+  #   dns_label_endpoint_b      = "t2dnslabelwest.westus.cloudapp.azure.com"
   id_of_targeted_resource_b = module.load_balancer_west.lb_pub_ip_id
-  ### "/subscriptions/65684f2a-01e2-443f-8763-39047d2a965b/resourceGroups/T2_RG_WEST/providers/Microsoft.Network/loadBalancers/lb_west"
+  # "/subscriptions/65684f2a-01e2-443f-8763-39047d2a965b/resourceGroups/T2_RG_WEST/providers/Microsoft.Network/loadBalancers/lb_west"
   weight_of_endpoint_b = 9
 }

@@ -49,3 +49,6 @@ variable "lb_rule_back_port" {
 variable "lb_rule_front_config_name" {
   type = string
 }
+variable "dns_label" {
+  type = string
+}

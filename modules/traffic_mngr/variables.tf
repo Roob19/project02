@@ -35,9 +35,15 @@ variable "tolerated_num_of_fails" {
 variable "endpoint_a" {
   type = string
 }
-variable "type_endpoint_a" {
-  type = string
-}
+# variable "type_endpoint_a" {
+#   type = string
+# }
+# variable "dns_label_endpoint_a" {
+#   type = string
+# }
+# variable "dns_label_endpoint_b" {
+#   type = string
+# }
 variable "id_of_targeted_resource_a" {
   type = string
 }
@@ -48,9 +54,9 @@ variable "weight_of_endpoint_a" {
 variable "endpoint_b" {
   type = string
 }
-variable "type_endpoint_b" {
-  type = string
-}
+# variable "type_endpoint_b" {
+#   type = string
+# }
 variable "id_of_targeted_resource_b" {
   type = string
 }
