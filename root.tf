@@ -18,7 +18,7 @@ module "vnet_regions" {
 }
 */
 
-### EAST
+###============================== EAST
 module "rg_east" {
   source   = "./modules/rg"
   rg_name  = "t2_rg_east"
@@ -41,6 +41,8 @@ module "load_balancer_east" {
   rg_name                   = module.rg_east.main_rg.name
   rg_location               = module.rg_east.main_rg.location
   lb_name                   = "vmss_lb_east"
+  pub_ip_sku                = "Standard"
+  lb_sku                    = "Standard"
   lb_front_ip_name          = "lb_frontend_ip_east"
   dns_label                 = "t2-pubip-dns-east"
   lb_nat_pool_name          = "lb_ssh_nat_east"
@@ -55,6 +57,16 @@ module "load_balancer_east" {
   lb_rule_front_port        = 80
   lb_rule_back_port         = 80
   lb_rule_front_config_name = "lb_frontend_ip_east"
+}
+
+module "app_gate_east" {
+  source                 = "./modules/app_gateway"
+  rg_name                = module.rg_east.main_rg.name
+  rg_location            = module.rg_east.main_rg.location
+  vnet                   = module.vnet_east.vnet_name
+  address_prefixes_front = ["172.16.5.0/24"]
+  address_prefixes_back  = ["172.24.5.0/24"]
+  pub_ip_allocation      = "Dynamic"
 }
 
 module "vmss_east" {
@@ -77,14 +89,26 @@ module "vmss_east" {
   disk_storage_type            = "Standard_LRS"
   disk_caching                 = "ReadWrite"
   #   vmss_custom_data = 
-  #   delete_os_disk_on_termination    = false
-  #   delete_data_disks_on_termination = false
   nic_name                 = "t2_vmss_nic_east"
   lb_backend_ids           = [module.load_balancer_east.lb_backend_pool_id]
   lb_inbound_nat_rules_ids = [module.load_balancer_east.lb_nat_pool_id]
+  sql_admin_un             = module.sql_server_and_dbs.mssql_server_admin_login_primary
+  sql_admin_pass           = module.sql_server_and_dbs.mssql_server_admin_pass_primary
+  sql_server_name          = module.sql_server_and_dbs.mssql_sever_name_primary
 }
 
-### WEST
+module "bastion_east" {
+  source                           = "./modules/bastion"
+  bastion_name                     = "t2_bastion_east"
+  rg_location                      = module.rg_east.main_rg.location
+  rg_name                          = module.rg_east.main_rg.name
+  pub_ip_sku                       = "Standard"
+  bastion_pub_ip_allocation_method = "Static"
+  vnet                             = module.vnet_east.vnet_name
+  bastion_address_prefixes         = ["172.16.3.0/24"]
+}
+
+###=============================== WEST
 module "rg_west" {
   source   = "./modules/rg"
   rg_name  = "t2_rg_west"
@@ -106,6 +130,8 @@ module "load_balancer_west" {
   lb_pub_ip_name            = "lb_pub_ip_west"
   rg_name                   = module.rg_west.main_rg.name
   rg_location               = module.rg_west.main_rg.location
+  pub_ip_sku                = "Standard"
+  lb_sku                    = "Standard"
   lb_name                   = "lb_west"
   lb_front_ip_name          = "lb_frontend_ip_west"
   dns_label                 = "t2-pubip-dns-west"
@@ -121,6 +147,16 @@ module "load_balancer_west" {
   lb_rule_front_port        = 80
   lb_rule_back_port         = 80
   lb_rule_front_config_name = "lb_frontend_ip_west"
+}
+
+module "app_gate_west" {
+  source                 = "./modules/app_gateway"
+  rg_name                = module.rg_west.main_rg.name
+  rg_location            = module.rg_west.main_rg.location
+  vnet                   = module.vnet_west.vnet_name
+  address_prefixes_front = ["192.16.5.0/24"]
+  address_prefixes_back  = ["192.24.5.0/24"]
+  pub_ip_allocation      = "Dynamic"
 }
 
 module "vmss_west" {
@@ -148,10 +184,24 @@ module "vmss_west" {
   nic_name                 = "t2_vmss_nic_west"
   lb_backend_ids           = [module.load_balancer_west.lb_backend_pool_id]
   lb_inbound_nat_rules_ids = [module.load_balancer_west.lb_nat_pool_id]
+  sql_admin_un             = module.sql_server_and_dbs.mssql_server_admin_login_secondary
+  sql_admin_pass           = module.sql_server_and_dbs.mssql_server_admin_pass_secondary
+  sql_server_name          = module.sql_server_and_dbs.mssql_sever_name_secondary
+}
+
+module "bastion_west" {
+  source                           = "./modules/bastion"
+  bastion_name                     = "t2_bastion_west"
+  rg_location                      = module.rg_west.main_rg.location
+  rg_name                          = module.rg_west.main_rg.name
+  pub_ip_sku                       = "Standard"
+  bastion_pub_ip_allocation_method = "Static"
+  vnet                             = module.vnet_west.vnet_name
+  bastion_address_prefixes         = ["192.16.3.0/24"]
 }
 
 
-### CENTRAL
+###============================= CENTRAL
 module "rg_cent" {
   source   = "./modules/rg"
   rg_name  = "t2_rg_cent"

@@ -7,6 +7,12 @@ variable "rg_name" {
 variable "rg_location" {
   type = string
 }
+variable "lb_sku" {
+  type = string
+}
+variable "pub_ip_sku" {
+  type = string
+}
 variable "lb_name" {
   type =string
 }

@@ -2,6 +2,7 @@ resource "azurerm_public_ip" "lb_pub_ip" {
   name = var.lb_pub_ip_name
   resource_group_name = var.rg_name
   location = var.rg_location
+  sku = var.pub_ip_sku
   allocation_method = "Static"
   domain_name_label = var.dns_label
 }
@@ -10,6 +11,7 @@ resource "azurerm_lb" "load_balancer" {
   name = var.lb_name
   resource_group_name = var.rg_name
   location = var.rg_location
+  sku = var.lb_sku
   
   frontend_ip_configuration {
     name = var.lb_front_ip_name

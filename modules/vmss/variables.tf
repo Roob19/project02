@@ -75,3 +75,12 @@ variable "lb_inbound_nat_rules_ids" {
 # variable "vmss_custom_data" {
 #   type = map
 # }
+variable "sql_admin_un" {
+  type = string
+}
+variable "sql_admin_pass" {
+  type = string
+}
+variable "sql_server_name" {
+  type = string
+}
