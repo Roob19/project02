@@ -169,12 +169,11 @@ module "vnet_cent" {
 }
 */
 module "traffic_manager" {
-  source            = "./modules/traffic_mngr"
-  traffic_mngr_name = "t2trafficmanager"
-  rg_name           = module.rg_cent.main_rg.name
-  route_method      = "Weighted"
-  dns_config_name   = "t2trafficmngrdnsconfig"
-  ### t2_traffic_mngr_dns_config.trafficmanager.net is invalid
+  source                 = "./modules/traffic_mngr"
+  traffic_mngr_name      = "t2trafficmanager"
+  rg_name                = module.rg_cent.main_rg.name
+  route_method           = "Weighted"
+  dns_config_name        = "t2trafficmngrdnsconfig" # t2_traffic_mngr_dns_config.trafficmanager.net is invalid
   ttl                    = 100
   monitor_protocol       = "HTTP"
   monitor_port_num       = 80
@@ -197,4 +196,25 @@ module "traffic_manager" {
   id_of_targeted_resource_b = module.load_balancer_west.lb_pub_ip_id
   # "/subscriptions/65684f2a-01e2-443f-8763-39047d2a965b/resourceGroups/T2_RG_WEST/providers/Microsoft.Network/loadBalancers/lb_west"
   weight_of_endpoint_b = 9
+}
+
+module "sql_server_and_dbs" {
+  source                                     = "./modules/db"
+  primary_sql_server_name                    = "t2-sql-server-primary"
+  secondary_sql_server_name                  = "t2-sql-server-secondary"
+  primary_rg_location                        = module.rg_east.main_rg.location
+  primary_rg_name                            = module.rg_east.main_rg.name
+  secondary_rg_location                      = module.rg_west.main_rg.location
+  secondary_rg_name                          = module.rg_west.main_rg.name
+  sql_admin_username                         = var.sql_admin_un
+  sql_admin_password                         = var.sql_admin_pass
+  primary_sql_server_version                 = "12.0"
+  secondary_sql_server_version               = "12.0"
+  primary_sql_server_public_access           = false
+  sql_db_name                                = "t2_database"
+  sql_db_collation                           = "SQL_Latin1_General_CP1_CI_AS"
+  sql_db_max_size_gb                         = "200"
+  sql_failover_group_name                    = "t2-failover"
+  sql_failover_endpoint_policy_mode          = "Automatic"
+  sql_failover_endpoint_policy_grace_minutes = 60
 }

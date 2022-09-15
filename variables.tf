@@ -2,12 +2,13 @@ variable "tenant_id" {
   type      = string
   sensitive = true
 }
-
 variable "subscription_id" {
   type      = string
   sensitive = true
 }
-
+variable "t2_sas_token" {
+  type = string
+}
 variable "prefix" {
   type = string
 }
@@ -23,31 +24,31 @@ variable "default_tags" {
   type        = map(string)
   description = "tags for resources"
 }
-
 variable "storage_account_name" {
   type        = string
   description = "Storge where backend's are"
 }
-
 variable "container_name" {
   type        = string
   description = "Where TF states are"
 }
-
 variable "admin_username" {
   type      = string
   sensitive = true
 }
-
 variable "admin_password" {
   type      = string
   sensitive = true
 }
-
 variable "azure_regions" {
   type = map(string)
 }
-
 variable "ip_class" {
   type = map(string)
+}
+variable "sql_admin_un" {
+  type = string
+}
+variable "sql_admin_pass" {
+  type = string
 }

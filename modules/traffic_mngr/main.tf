@@ -7,7 +7,7 @@ resource "azurerm_traffic_manager_profile" "main_traffic_mngr" {
     ttl = var.ttl
   }
   monitor_config {
-    protocol = var.monitor_protocol
+    protocol = upper(var.monitor_protocol)
     port = var.monitor_port_num
     path = var.monitor_path
     interval_in_seconds = var.interval_secs
