@@ -17,8 +17,8 @@ resource "azurerm_mysql_server" "mysql_server" {
 
   auto_grow_enabled                 = var.sql_server_auto_grow
   backup_retention_days             = var.sql_backup_retention_days
-  create_mode = var.sql_create_mode
-  creation_source_server_id = var.sql_create_mode != null ? "Replica" : null
+  create_mode = var.sql_create_mode != null ? "Replica" : null
+  creation_source_server_id = var.sql_create_mode != null ? var.sql_source_server_id : null
   geo_redundant_backup_enabled      = var.sql_geo_redundant_backup_enabled
   infrastructure_encryption_enabled = var.sql_infrastructure_encryption_enabled
   public_network_access_enabled     = var.sql_public_network_access_enabled

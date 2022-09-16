@@ -104,7 +104,7 @@ module "vmss_east" {
 
   #   vmss_custom_data             = file("t3_custom_data.sh")
   #   vmss_custom_data             = file("t1_custom_data.sh")
-  vmss_custom_data = file("kay_custom_data.sh")
+  vmss_custom_data = file("t2_custom_data.sh")
 
   nic_name                 = "t2_vmss_nic_east"
   lb_backend_ids           = [module.load_balancer_east.lb_backend_pool_id]
@@ -136,7 +136,7 @@ module "mysql_east" {
   sql_server_auto_grow                  = true
   sql_backup_retention_days             = 7
   sql_create_mode                       = null
-  sql_source_server_id                  = ""
+  sql_source_server_id                  = null
   sql_geo_redundant_backup_enabled      = false
   sql_infrastructure_encryption_enabled = false
   sql_public_network_access_enabled     = true
