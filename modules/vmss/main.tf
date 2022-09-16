@@ -45,7 +45,8 @@ resource "azurerm_linux_virtual_machine_scale_set" "linux_vmss" {
   disable_password_authentication = var.vmss_disable_pass_auth
 
 #   custom_data = base64encode(var.vmss_custom_data)
-    custom_data = base64encode(local.custom_data)
+    # custom_data = base64encode(local.custom_data)
+    custom_data = var.vmss_custom_data != null ? base64encode(var.vmss_custom_data) : base64encode(local.custom_data)
   
   source_image_reference {
     publisher = var.vm_image_publisher

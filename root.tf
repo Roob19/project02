@@ -73,13 +73,13 @@ module "load_balancer_east" {
 }
 
 module "app_gate_east" {
-  source                 = "./modules/app_gateway"
-  rg_name                = module.rg_east.main_rg.name
-  rg_location            = module.rg_east.main_rg.location
-  vnet                   = module.vnet_east.vnet_name
-  address_prefixes_front = ["172.16.5.0/24"]
-  address_prefixes_back  = ["172.24.5.0/24"]
-  pub_ip_allocation      = "Dynamic"
+  source                        = "./modules/app_gateway"
+  rg_name                       = module.rg_east.main_rg.name
+  rg_location                   = module.rg_east.main_rg.location
+  vnet                          = module.vnet_east.vnet_name
+  subnet_address_prefixes_front = ["172.16.5.0/24"]
+  subnet_address_prefixes_back  = ["172.24.5.0/24"]
+  pub_ip_allocation             = "Dynamic"
 }
 
 module "vmss_east" {
@@ -101,7 +101,11 @@ module "vmss_east" {
   vm_image_version             = "latest"
   disk_storage_type            = "Standard_LRS"
   disk_caching                 = "ReadWrite"
-  #   vmss_custom_data = 
+
+  #   vmss_custom_data             = file("t3_custom_data.sh")
+  #   vmss_custom_data             = file("t1_custom_data.sh")
+  vmss_custom_data = file("kay_custom_data.sh")
+
   nic_name                 = "t2_vmss_nic_east"
   lb_backend_ids           = [module.load_balancer_east.lb_backend_pool_id]
   lb_inbound_nat_rules_ids = [module.load_balancer_east.lb_nat_pool_id]
@@ -126,12 +130,12 @@ module "mysql_east" {
   sql_storage_mb       = 5120
   mysql_server_version = "5.7"
   #   sql_domain_name = ""
-  sql_replication_role                  = "Master"
-  sql_master_server_id                  = ""
-  sql_replica_capacity                  = 5
+  #   sql_replication_role                  = "Master"
+  #   sql_master_server_id                  = ""
+  #   sql_replica_capacity                  = 5
   sql_server_auto_grow                  = true
   sql_backup_retention_days             = 7
-  sql_create_mode                       = "Default"
+  sql_create_mode                       = null
   sql_source_server_id                  = ""
   sql_geo_redundant_backup_enabled      = false
   sql_infrastructure_encryption_enabled = false
@@ -199,13 +203,13 @@ module "load_balancer_west" {
 }
 
 module "app_gate_west" {
-  source                 = "./modules/app_gateway"
-  rg_name                = module.rg_west.main_rg.name
-  rg_location            = module.rg_west.main_rg.location
-  vnet                   = module.vnet_west.vnet_name
-  address_prefixes_front = ["192.16.5.0/24"]
-  address_prefixes_back  = ["192.24.5.0/24"]
-  pub_ip_allocation      = "Dynamic"
+  source                        = "./modules/app_gateway"
+  rg_name                       = module.rg_west.main_rg.name
+  rg_location                   = module.rg_west.main_rg.location
+  vnet                          = module.vnet_west.vnet_name
+  subnet_address_prefixes_front = ["192.16.5.0/24"]
+  subnet_address_prefixes_back  = ["192.24.5.0/24"]
+  pub_ip_allocation             = "Dynamic"
 }
 
 module "vmss_west" {
@@ -227,7 +231,9 @@ module "vmss_west" {
   vm_image_version             = "latest"
   disk_storage_type            = "Standard_LRS"
   disk_caching                 = "ReadWrite"
-  #   vmss_custom_data = 
+
+  vmss_custom_data = null
+
   nic_name                 = "t2_vmss_nic_west"
   lb_backend_ids           = [module.load_balancer_west.lb_backend_pool_id]
   lb_inbound_nat_rules_ids = [module.load_balancer_west.lb_nat_pool_id]
@@ -252,9 +258,9 @@ module "mysql_west" {
   sql_storage_mb       = 5120
   mysql_server_version = "5.7"
   #   sql_domain_name = ""
-#   sql_replication_role                  = "Replica"
-#   sql_master_server_id                  = module.mysql_east.mysql_server_id
-#   sql_replica_capacity                  = 0
+  #   sql_replication_role                  = "Replica"
+  #   sql_master_server_id                  = module.mysql_east.mysql_server_id
+  #   sql_replica_capacity                  = 0
   sql_server_auto_grow                  = true
   sql_backup_retention_days             = 7
   sql_create_mode                       = "Replica"

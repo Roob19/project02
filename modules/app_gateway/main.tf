@@ -2,14 +2,14 @@ resource "azurerm_subnet" "app_gate_subnet_frontend" {
   name                 = "${var.rg_name}_front_gate"
   resource_group_name  = var.rg_name
   virtual_network_name = var.vnet
-  address_prefixes     = var.address_prefixes_front
+  address_prefixes     = var.subnet_address_prefixes_front
 }
 
 resource "azurerm_subnet" "app_gate_subnet_backend" {
   name                 = "${var.rg_name}_back_gate"
   resource_group_name  = var.rg_name
   virtual_network_name = var.vnet
-  address_prefixes     = var.address_prefixes_back
+  address_prefixes     = var.subnet_address_prefixes_back
 }
 
 resource "azurerm_public_ip" "app_gate_pub_ip" {

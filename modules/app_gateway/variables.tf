@@ -7,10 +7,10 @@ variable "rg_location" {
 variable "vnet" {
   type = string
 }
-variable "address_prefixes_front" {
+variable "subnet_address_prefixes_front" {
   type = list(string)
 }
-variable "address_prefixes_back" {
+variable "subnet_address_prefixes_back" {
   type = list(string)
 }
 variable "pub_ip_allocation" {

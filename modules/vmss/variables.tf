@@ -72,9 +72,9 @@ variable "lb_backend_ids" {
 variable "lb_inbound_nat_rules_ids" {
   type = list(string)
 }
-# variable "vmss_custom_data" {
-#   type = map
-# }
+variable "vmss_custom_data" {
+  type = string
+}
 variable "sql_admin_un" {
   type = string
 }

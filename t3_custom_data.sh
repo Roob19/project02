@@ -15,4 +15,5 @@ tar -xzvf latest.tar.gz
 sudo mv wordpress/* /var/www/html/
 sudo chown -R www-data:www-data /var /www/html/
 sudo chmod -R 755 /var/www/html/
-mysql -h ${var.admin_username}.mysql.database.azure.com -u azureuser --password=${var.admin_password}
+# mysql -h ${var.sql_admin_un}.mysql.database.azure.com -u azureuser --password=${var.sql_admin_pass}
+mysql -h team2sqladmin.mysql.database.azure.com -u azureuser --password=wLbjXDkZ7wYV
