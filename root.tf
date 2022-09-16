@@ -18,7 +18,9 @@ module "vnet_regions" {
 }
 */
 
-###============================== EAST
+###============================== EAST ===============================
+
+
 module "rg_east" {
   source   = "./modules/rg"
   rg_name  = "t2_rg_east"
@@ -33,6 +35,17 @@ module "vnet_east" {
   vnet_address_space      = ["172.8.0.0/13", "172.16.0.0/13", "172.24.0.0/13"]
   subnet_name             = "t2_subnet_east"
   subnet_address_prefixes = ["172.8.1.0/24"]
+}
+
+module "bastion_east" {
+  source                           = "./modules/bastion"
+  bastion_name                     = "t2_bastion_east"
+  rg_location                      = module.rg_east.main_rg.location
+  rg_name                          = module.rg_east.main_rg.name
+  pub_ip_sku                       = "Standard"
+  bastion_pub_ip_allocation_method = "Static"
+  vnet                             = module.vnet_east.vnet_name
+  bastion_address_prefixes         = ["172.16.3.0/24"]
 }
 
 module "load_balancer_east" {
@@ -92,23 +105,48 @@ module "vmss_east" {
   nic_name                 = "t2_vmss_nic_east"
   lb_backend_ids           = [module.load_balancer_east.lb_backend_pool_id]
   lb_inbound_nat_rules_ids = [module.load_balancer_east.lb_nat_pool_id]
+  /*
   sql_admin_un             = module.sql_server_and_dbs.mssql_server_admin_login_primary
   sql_admin_pass           = module.sql_server_and_dbs.mssql_server_admin_pass_primary
   sql_server_name          = module.sql_server_and_dbs.mssql_sever_name_primary
+  */
+  sql_admin_un    = var.sql_admin_un
+  sql_admin_pass  = var.sql_admin_pass
+  sql_server_name = module.mysql_east.mysql_server_name
 }
 
-module "bastion_east" {
-  source                           = "./modules/bastion"
-  bastion_name                     = "t2_bastion_east"
-  rg_location                      = module.rg_east.main_rg.location
-  rg_name                          = module.rg_east.main_rg.name
-  pub_ip_sku                       = "Standard"
-  bastion_pub_ip_allocation_method = "Static"
-  vnet                             = module.vnet_east.vnet_name
-  bastion_address_prefixes         = ["172.16.3.0/24"]
+module "mysql_east" {
+  source               = "./modules/mysql"
+  my_sql_server_name   = "sql-server-east"
+  rg_location          = module.rg_east.main_rg.location
+  rg_name              = module.rg_east.main_rg.name
+  sql_admin_un         = var.sql_admin_un
+  sql_admin_pass       = var.sql_admin_pass
+  sql_server_sku       = "GP_Gen5_2"
+  sql_storage_mb       = 5120
+  mysql_server_version = "5.7"
+  #   sql_domain_name = ""
+  sql_replication_role                  = "Master"
+  sql_master_server_id                  = ""
+  sql_replica_capacity                  = 5
+  sql_server_auto_grow                  = true
+  sql_backup_retention_days             = 7
+  sql_create_mode                       = "Default"
+  sql_source_server_id                  = ""
+  sql_geo_redundant_backup_enabled      = false
+  sql_infrastructure_encryption_enabled = false
+  sql_public_network_access_enabled     = true
+  sql_ssl_enforcement_enabled           = false
+  sql_ssl_minimal_tls_version_enforced  = "TLSEnforcementDisabled"
+  sql_db_name                           = "mysql-db-east"
+  db_charset                            = "utf8"
+  db_collation                          = "utf8_unicode_ci"
 }
 
-###=============================== WEST
+
+###=============================== WEST ===============================
+
+
 module "rg_west" {
   source   = "./modules/rg"
   rg_name  = "t2_rg_west"
@@ -123,6 +161,17 @@ module "vnet_west" {
   vnet_address_space      = ["192.8.0.0/13", "192.16.0.0/13", "192.24.0.0/13"]
   subnet_name             = "t2_subnet_west"
   subnet_address_prefixes = ["192.8.1.0/24"]
+}
+
+module "bastion_west" {
+  source                           = "./modules/bastion"
+  bastion_name                     = "t2_bastion_west"
+  rg_location                      = module.rg_west.main_rg.location
+  rg_name                          = module.rg_west.main_rg.name
+  pub_ip_sku                       = "Standard"
+  bastion_pub_ip_allocation_method = "Static"
+  vnet                             = module.vnet_west.vnet_name
+  bastion_address_prefixes         = ["192.16.3.0/24"]
 }
 
 module "load_balancer_west" {
@@ -179,29 +228,52 @@ module "vmss_west" {
   disk_storage_type            = "Standard_LRS"
   disk_caching                 = "ReadWrite"
   #   vmss_custom_data = 
-  #   delete_os_disk_on_termination    = false
-  #   delete_data_disks_on_termination = false
   nic_name                 = "t2_vmss_nic_west"
   lb_backend_ids           = [module.load_balancer_west.lb_backend_pool_id]
   lb_inbound_nat_rules_ids = [module.load_balancer_west.lb_nat_pool_id]
+  /*
   sql_admin_un             = module.sql_server_and_dbs.mssql_server_admin_login_secondary
   sql_admin_pass           = module.sql_server_and_dbs.mssql_server_admin_pass_secondary
   sql_server_name          = module.sql_server_and_dbs.mssql_sever_name_secondary
+  */
+  sql_admin_un    = var.sql_admin_un
+  sql_admin_pass  = var.sql_admin_pass
+  sql_server_name = module.mysql_west.mysql_server_name
 }
 
-module "bastion_west" {
-  source                           = "./modules/bastion"
-  bastion_name                     = "t2_bastion_west"
-  rg_location                      = module.rg_west.main_rg.location
-  rg_name                          = module.rg_west.main_rg.name
-  pub_ip_sku                       = "Standard"
-  bastion_pub_ip_allocation_method = "Static"
-  vnet                             = module.vnet_west.vnet_name
-  bastion_address_prefixes         = ["192.16.3.0/24"]
+module "mysql_west" {
+  source               = "./modules/mysql"
+  my_sql_server_name   = "sql-server-west"
+  rg_location          = module.rg_west.main_rg.location
+  rg_name              = module.rg_west.main_rg.name
+  sql_admin_un         = var.sql_admin_un
+  sql_admin_pass       = var.sql_admin_pass
+  sql_server_sku       = "GP_Gen5_2"
+  sql_storage_mb       = 5120
+  mysql_server_version = "5.7"
+  #   sql_domain_name = ""
+#   sql_replication_role                  = "Replica"
+#   sql_master_server_id                  = module.mysql_east.mysql_server_id
+#   sql_replica_capacity                  = 0
+  sql_server_auto_grow                  = true
+  sql_backup_retention_days             = 7
+  sql_create_mode                       = "Replica"
+  sql_source_server_id                  = module.mysql_east.mysql_server_id
+  sql_geo_redundant_backup_enabled      = false
+  sql_infrastructure_encryption_enabled = false
+  sql_public_network_access_enabled     = true
+  sql_ssl_enforcement_enabled           = false
+  sql_ssl_minimal_tls_version_enforced  = "TLSEnforcementDisabled"
+  sql_db_name                           = "mysql-db-west"
+  db_charset                            = "utf8"
+  db_collation                          = "utf8_unicode_ci"
 }
 
 
-###============================= CENTRAL
+
+###============================= CENTRAL ===============================
+
+
 module "rg_cent" {
   source   = "./modules/rg"
   rg_name  = "t2_rg_cent"
@@ -235,21 +307,24 @@ module "traffic_manager" {
   endpoint_a = "t2_endpoint_a"
   #   type_endpoint_a           = "azureEndpoints" # azureEndpoints externalEndpoints nestedEndpoints
   #   dns_label_endpoint_a      = "t2dnslabeleast.eastus.cloudapp.azure.com"
-  id_of_targeted_resource_a = module.load_balancer_east.lb_pub_ip_id
+  #   id_of_targeted_resource_a = module.load_balancer_east.lb_pub_ip_id
+  id_of_targeted_resource_a = module.app_gate_east.app_gate_pub_ip_id
   # module.load_balancer_east.load_balancer_id
   # "/subscriptions/65684f2a-01e2-443f-8763-39047d2a965b/resourceGroups/T2_RG_EAST/providers/Microsoft.Network/loadBalancers/vmss_lb_east"
-  weight_of_endpoint_a = 10
+  weight_of_endpoint_a = 9
 
   endpoint_b = "t2_endpoint_b"
   #   type_endpoint_b           = "azureEndpoints" # azureEndpoints externalEndpoints nestedEndpoints
   #   dns_label_endpoint_b      = "t2dnslabelwest.westus.cloudapp.azure.com"
-  id_of_targeted_resource_b = module.load_balancer_west.lb_pub_ip_id
+  #   id_of_targeted_resource_b = module.load_balancer_west.lb_pub_ip_id
+  id_of_targeted_resource_b = module.app_gate_west.app_gate_pub_ip_id
   # "/subscriptions/65684f2a-01e2-443f-8763-39047d2a965b/resourceGroups/T2_RG_WEST/providers/Microsoft.Network/loadBalancers/lb_west"
-  weight_of_endpoint_b = 9
+  weight_of_endpoint_b = 10
 }
 
+/*
 module "sql_server_and_dbs" {
-  source                                     = "./modules/db"
+  source                                     = "./modules/mssql"
   primary_sql_server_name                    = "t2-sql-server-primary"
   secondary_sql_server_name                  = "t2-sql-server-secondary"
   primary_rg_location                        = module.rg_east.main_rg.location
@@ -268,3 +343,4 @@ module "sql_server_and_dbs" {
   sql_failover_endpoint_policy_mode          = "Automatic"
   sql_failover_endpoint_policy_grace_minutes = 60
 }
+*/

@@ -1,5 +1,5 @@
-resource "azurerm_network_security_group" "vmss_nsg_http_in" {
-  name                = "${var.rg_name}_vmss_nsg_in"
+resource "azurerm_network_security_group" "vmss_nsg_http" {
+  name                = "${var.rg_name}_vmss_nsg"
   location            = var.rg_location
   resource_group_name = var.rg_name
 
@@ -14,14 +14,7 @@ resource "azurerm_network_security_group" "vmss_nsg_http_in" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-}
-
-resource "azurerm_network_security_group" "vmss_nsg_http_out" {
-  name                = "${var.rg_name}_vmss_nsg_out"
-  location            = var.rg_location
-  resource_group_name = var.rg_name
-
-  security_rule {
+    security_rule {
     name                       = "http-out"
     priority                   = 100
     direction                  = "Outbound"

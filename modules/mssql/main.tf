@@ -1,4 +1,4 @@
-resource "azurerm_mssql_server" "mysql_server_primary" {
+resource "azurerm_mssql_server" "mssql_server_primary" {
   name                = var.primary_sql_server_name
   location            = var.primary_rg_location
   resource_group_name = var.primary_rg_name
@@ -13,7 +13,7 @@ resource "azurerm_mssql_server" "mysql_server_primary" {
 resource "azurerm_mssql_database" "mysql_db" {
   name                = var.sql_db_name
 #resource_group_name = var.rg_name
-  server_id           = azurerm_mssql_server.mysql_server_primary.id  
+  server_id           = azurerm_mssql_server.mssql_server_primary.id  
   collation           = var.sql_db_collation
   max_size_gb = var.sql_db_max_size_gb
 }
@@ -31,8 +31,8 @@ resource "azurerm_mssql_server" "mysql_server_secondary" {
 resource "azurerm_mssql_failover_group" "sql_failover_group" {
   name        = var.sql_failover_group_name
 #   resource_group_name = var.primary_rg_name
-#   server_name = azurerm_mssql_server.mysql_server_primary.name
-  server_id = azurerm_mssql_server.mysql_server_primary.id
+#   server_name = azurerm_mssql_server.mssql_server_primary.name
+  server_id = azurerm_mssql_server.mssql_server_primary.id
   databases   = [
     azurerm_mssql_database.mysql_db.id
   ]
