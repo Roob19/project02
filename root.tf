@@ -296,12 +296,12 @@ module "vnet_cent" {
   subnet_address_prefixes = ["10.8.1.0/24"]
 }
 */
-module "traffic_manager" {
+module "traffic_manager_app_gate" {
   source                 = "./modules/traffic_mngr"
-  traffic_mngr_name      = "t2trafficmanager"
+  traffic_mngr_name      = "t2trafficmanagerappgate"
   rg_name                = module.rg_cent.main_rg.name
   route_method           = "Weighted"
-  dns_config_name        = "t2trafficmngrdnsconfig" # t2_traffic_mngr_dns_config.trafficmanager.net is invalid
+  dns_config_name        = "t2trafficmngrdnsconfigappgate" # t2_traffic_mngr_dns_config.trafficmanager.net is invalid
   ttl                    = 100
   monitor_protocol       = "HTTP"
   monitor_port_num       = 80
@@ -317,7 +317,7 @@ module "traffic_manager" {
   id_of_targeted_resource_a = module.app_gate_east.app_gate_pub_ip_id
   # module.load_balancer_east.load_balancer_id
   # "/subscriptions/65684f2a-01e2-443f-8763-39047d2a965b/resourceGroups/T2_RG_EAST/providers/Microsoft.Network/loadBalancers/vmss_lb_east"
-  weight_of_endpoint_a = 9
+  weight_of_endpoint_a = 1
 
   endpoint_b = "t2_endpoint_b"
   #   type_endpoint_b           = "azureEndpoints" # azureEndpoints externalEndpoints nestedEndpoints
@@ -325,7 +325,73 @@ module "traffic_manager" {
   #   id_of_targeted_resource_b = module.load_balancer_west.lb_pub_ip_id
   id_of_targeted_resource_b = module.app_gate_west.app_gate_pub_ip_id
   # "/subscriptions/65684f2a-01e2-443f-8763-39047d2a965b/resourceGroups/T2_RG_WEST/providers/Microsoft.Network/loadBalancers/lb_west"
-  weight_of_endpoint_b = 10
+  weight_of_endpoint_b = 2
+}
+
+module "traffic_manager_lb" {
+  source                 = "./modules/traffic_mngr"
+  traffic_mngr_name      = "t2trafficmanagerlb"
+  rg_name                = module.rg_cent.main_rg.name
+  route_method           = "Weighted"
+  dns_config_name        = "t2trafficmngrdnsconfiglb" # t2_traffic_mngr_dns_config.trafficmanager.net is invalid
+  ttl                    = 100
+  monitor_protocol       = "HTTP"
+  monitor_port_num       = 80
+  monitor_path           = "/"
+  interval_secs          = 30
+  timeout_secs           = 9
+  tolerated_num_of_fails = 3
+
+  endpoint_a = "t2_endpoint_a"
+  #   type_endpoint_a           = "azureEndpoints" # azureEndpoints externalEndpoints nestedEndpoints
+  #   dns_label_endpoint_a      = "t2dnslabeleast.eastus.cloudapp.azure.com"
+  id_of_targeted_resource_a = module.load_balancer_east.lb_pub_ip_id
+  #   id_of_targeted_resource_a = module.app_gate_east.app_gate_pub_ip_id
+  # module.load_balancer_east.load_balancer_id
+  # "/subscriptions/65684f2a-01e2-443f-8763-39047d2a965b/resourceGroups/T2_RG_EAST/providers/Microsoft.Network/loadBalancers/vmss_lb_east"
+  weight_of_endpoint_a = 3
+
+  endpoint_b = "t2_endpoint_b"
+  #   type_endpoint_b           = "azureEndpoints" # azureEndpoints externalEndpoints nestedEndpoints
+  #   dns_label_endpoint_b      = "t2dnslabelwest.westus.cloudapp.azure.com"
+  id_of_targeted_resource_b = module.load_balancer_west.lb_pub_ip_id
+  #   id_of_targeted_resource_b = module.app_gate_west.app_gate_pub_ip_id
+  # "/subscriptions/65684f2a-01e2-443f-8763-39047d2a965b/resourceGroups/T2_RG_WEST/providers/Microsoft.Network/loadBalancers/lb_west"
+  weight_of_endpoint_b = 4
+}
+
+module "traffic_manager_kay" {
+  source                 = "./modules/traffic_mngr"
+  traffic_mngr_name      = "t2trafficmanagerkay"
+  rg_name                = module.rg_cent.main_rg.name
+  route_method           = "Weighted"
+  dns_config_name        = "t2trafficmngrdnsconfigkay" # t2_traffic_mngr_dns_config.trafficmanager.net is invalid
+  ttl                    = 100
+  monitor_protocol       = "HTTP"
+  monitor_port_num       = 80
+  monitor_path           = "/"
+  interval_secs          = 30
+  timeout_secs           = 9
+  tolerated_num_of_fails = 3
+
+  endpoint_a = "t2_endpoint_a"
+  #   type_endpoint_a           = "azureEndpoints" # azureEndpoints externalEndpoints nestedEndpoints
+  #   dns_label_endpoint_a      = "t2dnslabeleast.eastus.cloudapp.azure.com"
+  id_of_targeted_resource_a = "/subscriptions/65684f2a-01e2-443f-8763-39047d2a965b/resourceGroups/Team2Proj2_rg1/providers/Microsoft.Network/loadBalancers/vmss-lb"
+  #   id_of_targeted_resource_a = module.load_balancer_east.lb_pub_ip_id
+  #   id_of_targeted_resource_a = module.app_gate_east.app_gate_pub_ip_id
+  # module.load_balancer_east.load_balancer_id
+  # "/subscriptions/65684f2a-01e2-443f-8763-39047d2a965b/resourceGroups/T2_RG_EAST/providers/Microsoft.Network/loadBalancers/vmss_lb_east"
+  weight_of_endpoint_a = 5
+
+  endpoint_b = "t2_endpoint_b"
+  #   type_endpoint_b           = "azureEndpoints" # azureEndpoints externalEndpoints nestedEndpoints
+  #   dns_label_endpoint_b      = "t2dnslabelwest.westus.cloudapp.azure.com"
+  id_of_targeted_resource_b = "/subscriptions/65684f2a-01e2-443f-8763-39047d2a965b/resourceGroups/Team2Proj2_rg2/providers/Microsoft.Network/loadBalancers/vmss-lb2"
+  #   id_of_targeted_resource_b = module.load_balancer_west.lb_pub_ip_id
+  #   id_of_targeted_resource_b = module.app_gate_west.app_gate_pub_ip_id
+  # "/subscriptions/65684f2a-01e2-443f-8763-39047d2a965b/resourceGroups/T2_RG_WEST/providers/Microsoft.Network/loadBalancers/lb_west"
+  weight_of_endpoint_b = 6
 }
 
 /*
